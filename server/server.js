@@ -6,13 +6,23 @@ import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
 
+import mongooseService from './services/mongoose'
 import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
+import User from './model/User.model' 
 
 require('colors')
 
 let Root
+
+mongooseService.connect()
+const user = new User({  
+  email: 'test@gmail.com',  
+  password: 'abracadabra'  
+})  
+user.save()
+
 try {
   // eslint-disable-next-line import/no-unresolved
   Root = require('../dist/assets/js/ssr/root.bundle').default
@@ -64,6 +74,11 @@ server.get('/*', (req, res) => {
     res.end()
   })
 })
+
+server.post('/api/v1/auth', (req, res) => {  
+  console.log(req.body)  
+  res.json({ status: 'ok' })  
+}) 
 
 const app = server.listen(port)
 
